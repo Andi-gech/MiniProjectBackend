@@ -9,7 +9,9 @@ const ExamSchema=mongoose.Schema(
                 ref:"Question"
             }
         ],
-        totalMarks:Number,
+        
+        
+
         passingMarks:Number,
         examDuration:Number
     }
@@ -18,7 +20,7 @@ const Exam=mongoose.model("Exam",ExamSchema)
 const JoiExam=joi.object({
     title:joi.string().required(),
     questions:joi.array().required(),
-    totalMarks:joi.number().required(),
+  
     passingMarks:joi.number().required(),
     examDuration:joi.number().required()
 })

@@ -16,7 +16,7 @@ const Question = mongoose.model("Question", QuestionSchema);
 const JoiQuestion=joi.object({
     question:joi.string().required(),
     mark:joi.number().required(),
-    answers:joi.array().required(),
+    answers:joi.array(),
 })
 const ValidateJoiSchema = (data) => {
     return JoiQuestion.validate(data);

@@ -6,8 +6,9 @@ const CourseModuleSchema=mongoose.Schema(
         content:String,
         completionExams:{
             type:mongoose.Schema.Types.ObjectId,
-            ref:"Exams"
-        }
+            ref:"Exam"
+        },
+       
     }
 )
 const CourseModule=mongoose.model("CourseModule",CourseModuleSchema)
