@@ -1,5 +1,6 @@
 const mongoose=require('mongoose')
 const joi=require('joi')
+const { CourseModule } = require('./CourseModule')
 const ExamSchema=mongoose.Schema(
     {
         title:String,
@@ -9,6 +10,10 @@ const ExamSchema=mongoose.Schema(
                 ref:"Question"
             }
         ],
+        CourseModule:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"CourseModule"
+        },
         
         
 
@@ -20,6 +25,7 @@ const Exam=mongoose.model("Exam",ExamSchema)
 const JoiExam=joi.object({
     title:joi.string().required(),
     questions:joi.array().required(),
+    CourseModule:joi.string().required(),
   
     passingMarks:joi.number().required(),
     examDuration:joi.number().required()

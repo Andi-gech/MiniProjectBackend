@@ -4,10 +4,18 @@ const CourseModuleSchema=mongoose.Schema(
     {
         name:String,
         content:String,
-        completionExams:{
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"Exam"
+        videolink:String,
+        order:{
+            type:Number,
+            default:0,
+            unique:true,
+            min:0
         },
+        course:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"Course"
+        },
+       
        
     }
 )
@@ -15,7 +23,9 @@ const CourseModule=mongoose.model("CourseModule",CourseModuleSchema)
 const CourseModuleJoi=joi.object({
     name:joi.string().required(),
     content:joi.string().required(),
- 
+    order:joi.number().required(),
+    course:joi.string().required(),
+  
 })
 const validateCourseModule=(data)=>{
     return CourseModuleJoi.validate(data)

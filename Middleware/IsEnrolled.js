@@ -1,31 +1,24 @@
-const { EnrolledCourse } = require("../model/EnrolledCourse");
-const mongoose = require("mongoose");
+const EnrolledCourse = require("../model/EnrolledCourse");
 
 const isEnrolled = async (req, res, next) => {
-
     try {
-        console.log("passed to rnroo")
-        const isvalid=mongoose.Types.ObjectId.isValid(req.params.id)
-        if(!isvalid){
-            return res.status(400).send("invalid id")
+        const courseId = req.params.courseid;
+        const userId = req.user._id;
+
+        const isValid = mongoose.Types.ObjectId.isValid(courseId);
+        if (!isValid) {
+            return res.status(400).send("Invalid id");
         }
-          console.log(req.user)
-        
-        const result = await EnrolledCourse.find(
-            {
-                user: req.user._id,
-                course: req.params.id
-            }
-        );
-        
-        if (result.length == 0) {
-            return res.status(400).json({ error: 'User is not enrolled in this course' });
+
+        const result = await EnrolledCourse.findOne({ user: userId, course: courseId });
+        if (!result) {
+            return res.status(401).json({ error: 'User is not enrolled in this course' });
         }
-        console.log("passs 2")
+
         next();
+    } catch (error) {
+        res.status(500).send(error);
     }
-    catch (error) {
-        res.status(500).send(error)
-    }
-}
-module.exports = isEnrolled
+};
+
+module.exports = isEnrolled;

@@ -1,35 +1,35 @@
-const express=require('express')
-const app=express()
-const connect=require('./Connect')
-var cors = require('cors')
-const User=require('./Routes/User')
-const Courses=require('./Routes/Courses')
-const Questions=require('./Routes/Questions')
-const Exams=require('./Routes/Exams')
-const Answer=require('./Routes/Answer')
-const Documentation=require('./Routes/Documentation')
-const CourseModule=require('./Routes/CourseModule')
-const EnrolledCourse=require('./Routes/Enrollment')
+const express = require('express');
+const app = express();
+const connect = require('./Connect');
+const cors = require('cors');
+const User = require('./Routes/User');
+const Courses = require('./Routes/Courses');
+const Exams = require('./Routes/Exams');
+const CourseModule = require('./Routes/CourseModule');
+const EnrolledCourse = require('./Routes/EnrollmentController');
+const CourseCategory = require('./Routes/CourseCatagory'); // Corrected typo in variable name
+const Admin = require('./Routes/AdminController');
 
-app.use(cors())
-app.use(express.json())
+app.use(cors());
+app.use(express.json());
 
-app.use('/api/user',User)
-app.use('/api/courses',Courses)
-app.use('/api/questions',Questions)
+// Serve static files from the 'public' directory
+app.use(express.static('public'));
+app.use('/images', express.static('public'));
 
-app.use('/api/exams',Exams)
-app.use('/api/answer',Answer)
-app.use('/api/coursemodule',CourseModule)
-app.use('/api/enrolledcourse',EnrolledCourse)
-app.use('/',Documentation)
+app.use('/api/user', User);
+app.use('/api/courses', Courses);
+app.use('/api/admin', Admin);
+app.use('/api/exams', Exams);
+app.use('/api/coursemodule', CourseModule);
+app.use('/api/enroll', EnrolledCourse);
+app.use('/api/coursecatagory', CourseCategory); // Corrected typo in route path
 
-app.listen(8080,async()=>{
-    try{
-        await connect()
-        console.log("listening on port 8080")
+app.listen(8080, async () => {
+    try {
+        await connect();
+        console.log("listening on port 8080");
+    } catch (err) {
+        console.log(err);
     }
-    catch(err){
-        console.log(err)
-    }
-})
+});

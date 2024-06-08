@@ -10,32 +10,30 @@ const CourseSchema=mongoose.Schema(
             type:mongoose.Schema.Types.ObjectId,
             ref:"CourseCatagory"
         },
-        modules:[
-            {
-                order:{
-                    type:Number,
-                    default:0,
-                    unique:true,
-            
-                    min:0
-                },
-            lesson:{
-                type:mongoose.Schema.Types.ObjectId,
-                ref:"CourseModule",
-                unique:true
-            }
-        }
-        ],
+        createdBy:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"User"
+        },
+        
+        
        
-       
-    }
+    }, { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 )
+CourseSchema.virtual('coursemodules', {
+    ref: 'CourseModule',
+    localField: '_id',
+    foreignField: 'course'
+});
+
+
 const CourseJoi=joi.object({
     name:joi.string().required(),
-    description:joi.string(),
-    image:joi.string(),
-    catagory:joi.string(),
-    modules:joi.array(),
+    description:joi.string().required(),
+    image:joi.string().required(),
+    catagory:joi.string().required(),
+    createdBy:joi.string().required(),
+    
+    
 })
 const Course=mongoose.model("Course",CourseSchema)
 const validateCourse=(data)=>{
