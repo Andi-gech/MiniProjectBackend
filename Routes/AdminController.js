@@ -97,7 +97,7 @@ router.get('/courses/:courseid', AuthMiddleware,isAdmin,CourseOwner,async (req, 
       if (!result) {
         return res.status(404).send("Course not found");
       }
-      const courseModules = await CourseModule.find({ course: req.params.courseid });
+      const courseModules = await CourseModule.find({ course: req.params.courseid }).sort({ order: 1 })
   
       const enrolledStudents=await EnrolledCourse.find({course:req.params.courseid}).populate('user')
        return res.send({ result, courseModules, enrolledStudents });
@@ -119,6 +119,11 @@ router.post("/:courseid/createModule",AuthMiddleware,isAdmin,CourseOwner, async 
     
     if (error) {
         return res.status(400).send(error.details[0].message);
+    }
+    const alreadyexist=await CourseModule.findOne({order:req.body.order,course:req.params.courseid})
+    console.log(alreadyexist)
+    if(alreadyexist){
+        return res.status(400).send("order already exist")
     }
     const result = await CourseModule.create(req.body)
     res.send(result)

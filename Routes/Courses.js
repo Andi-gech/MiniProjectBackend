@@ -6,6 +6,7 @@ const { CourseModule } = require('../model/CourseModule');
 
 router.get('/', async (req, res) => {
   try {
+    console.log(req.query.q)
     const query = req.query.q || '';
     const categoryId = req.query.category || '';
 

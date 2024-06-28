@@ -7,8 +7,8 @@ const CourseModuleSchema=mongoose.Schema(
         videolink:String,
         order:{
             type:Number,
-            default:0,
-            unique:true,
+            
+          
             min:0
         },
         course:{

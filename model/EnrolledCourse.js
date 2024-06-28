@@ -23,11 +23,6 @@ const EnrolledCourseSchema = new mongoose.Schema({
     ]
     ,
 
-    AttemptsRemaining: {
-        default: 3,
-        type:Number,
-
-    },
     
 })
 const EnrolledCourse = mongoose.model("EnrolledCourse", EnrolledCourseSchema);

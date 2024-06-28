@@ -20,6 +20,7 @@ router.get("/:moduleid", AuthMiddleware,isModuleAvailable,async (req, res) => {
 router.get("/course/:courseid", AuthMiddleware, async (req, res) => {
   try {
     const result = await CourseModule.find({ course: req.params.courseid }).sort({ order: 1 });
+  
     return res.send(result);
   } catch (error) {
     return res.status(500).send(error.message);
