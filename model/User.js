@@ -9,9 +9,36 @@ const userSchema = new mongoose.Schema({
         enum:['admin','student','teacher'],
         default:'student'
     },
-profilepic:String
+profilepic:String,
+status:{
+    type:Boolean,
+    default:false
+},
+rating:[
+    {
+        rate:{
+            type:Number,
+            min:0,
+            max:5
+        },
+        user:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"User"
+        }
+    }
+]
 
+}, {
+    toJSON: { virtuals: true }, // Enable virtuals in JSON output
+    toObject: { virtuals: true } // Enable virtuals in object output
 })
+userSchema.virtual('averageRating').get(function () {
+    if (this.rating.length === 0) {
+        return 0;
+    }
+    const total = this.rating.reduce((acc, rating) => acc + rating.rate, 0);
+    return total / this.rating.length;
+});
 
 const User = mongoose.model("User", userSchema);
 const Joiuser=joi.object({
@@ -32,7 +59,9 @@ const Joiuser=joi.object({
             
         }
     ),
-    profilepic:joi.string()
+    profilepic:joi.string(),
+    status:joi.boolean()
+
 })
 const joiauth=joi.object({
     email:joi.string().min(6).email().required(),
@@ -44,6 +73,8 @@ const joiauth=joi.object({
       'string.empty': `Password cannot be empty.`,
       'any.required': `Password is required.`
     })
+    
+
     
 })
 const ValidateJoiSchema=(data)=>{

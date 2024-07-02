@@ -23,8 +23,18 @@ router.get('/:courseid', AuthMiddleware, async (req, res) => {
 
 router.get("/", AuthMiddleware, async (req, res) => {
   try {
-    const enrolledCourses = await EnrolledCourse.find({ user: req.user._id })
-     
+    const enrolledCourses = await EnrolledCourse.find({ user: req.user._id }).populate({
+      path: "course",
+      populate: [
+        {
+          path: "coursemodules",
+               },
+        {
+          path: "createdBy",
+              }
+      ]
+    });
+    
 
     return res.send(enrolledCourses);
   } catch (error) {

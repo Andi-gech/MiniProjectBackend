@@ -3,6 +3,8 @@ const router=express.Router()
 const {User,ValidateJoiSchema,ValidateJoiAuth}=require('../model/User')
 const bcrypt=require('bcrypt')
 const jwt =require('jsonwebtoken')
+const AuthMiddleware = require('../Middleware/AuthMiddleware')
+const { Notification } = require('../model/Notification')
 const secretpassword="mysecretpassword"
 
 router.post('/Auth',async (req,res)=>{
@@ -24,7 +26,7 @@ console.log(user)
         return res.status(400).send('invalid email or password')
     }
     const token=jwt.sign({_id:user._id,role:user.role,fullName:user.fullName,email:user.email},secretpassword,{expiresIn:'7d'})
-    res.send({
+       res.send({
         token:token,
         role:user.role,
         name:user.fullName
@@ -36,7 +38,7 @@ console.log(user)
     
 
 
-  
+   
 })
 
 router.post('/create',async (req,res)=>{
@@ -49,6 +51,7 @@ router.post('/create',async (req,res)=>{
     const hashedPassword=await bcrypt.hash(req.body.password,salt)
     req.body.password=hashedPassword
     const user=await User.create(req.body)
+    Notification.create({user:user._id,description:`Welcome ${user.fullName}`})
     res.send(user)
 }
     catch (error) {
@@ -57,4 +60,72 @@ router.post('/create',async (req,res)=>{
     }
  
 })
+router.get('/all',async (req,res)=>{
+    try {
+        const result=await User.find({role:{$ne:'admin'}},{password:0})
+        return res.send(result)
+        
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send(error.message)
+    }
+})
+router.get('/Teacher',async (req,res)=>{
+    try {
+        const result=await User.find({role:'teacher'}).sort({ averageRating: -1})
+        
+        return res.send(result)
+        
+    } catch (error) {
+        return res.status(500).send(error.message)
+    }
+})
+router.get('/:id',async (req,res)=>{
+    try {
+        const result=await User.findById(req.params.id)
+        return res.send(result)
+        
+    } catch (error) {
+        return res.status(500).send(error.message)
+    }
+})
+router.put('/:id',async (req,res)=>{
+    try {
+        const result=await User.findByIdAndUpdate(req.params.id,req.body)
+        return res.send(result)
+        
+    } catch (error) {
+        return res.status(500).send(error.message)
+    }
+})
+router.delete('/:id',async (req,res)=>{
+    try {
+        const result=await User.findByIdAndDelete(req.params.id)
+        return res.send(result)
+        
+    } catch (error) {
+        return res.status(500).send(error.message)
+    }
+})
+
+router.put('/rate/:id',AuthMiddleware,async (req,res)=>{
+    try {
+        console.log(req.body.rate)
+        console.log(req.user._id)
+        const result=await User.findByIdAndUpdate(req.params.id,{
+            $push: {
+              rating:{
+                rate:req.body.rate,
+                user:req.user._id
+              } 
+            },
+           
+        },{new:true})
+        return res.send(result)
+     
+    } catch (error) {
+        return res.status(500).send(error.message)
+    }
+})
+
 module.exports=router

@@ -56,6 +56,7 @@ router.post('/createCourse',AuthMiddleware,isAdmin,upload.single("image"),async(
       if(!image){
           return res.status(400).send("image is required")
       }
+      
       req.body.image=`uploads/catagory/${image.filename}`
       req.body.createdBy=req.user._id
       const {error}=validateCourse(req.body)
@@ -89,6 +90,27 @@ router.get('/courses', AuthMiddleware,isAdmin,async (req, res) => {
   
     
   })
+router.get('/courses/inactive',async (req, res) => {
+    try {
+      const result = await Course.find({
+        status: false
+      })
+      return res.send(result);
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  
+})
+router.put('/courses/approve/:id',AuthMiddleware,async (req, res) => {
+    try {
+      const result = await Course.findByIdAndUpdate(req.params.id, {
+        status: true
+      })
+      return res.send(result);
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+})
 ///////get single course
 
 router.get('/courses/:courseid', AuthMiddleware,isAdmin,CourseOwner,async (req, res) => {
@@ -109,12 +131,18 @@ router.get('/courses/:courseid', AuthMiddleware,isAdmin,CourseOwner,async (req, 
 
 
 //create Module
-router.post("/:courseid/createModule",AuthMiddleware,isAdmin,CourseOwner, async (req, res) => {
+router.post("/:courseid/createModule",AuthMiddleware,isAdmin,CourseOwner,upload.single("video"), async (req, res) => {
     try {
       req.body.course=req.params.courseid
     
 
     const { error } = validateCourseModule(req.body);
+    const video = req.file;
+    if(video){
+      req.body.videolink=`uploads/catagory/${video.filename}`
+    }
+    
+    
    
     
     if (error) {

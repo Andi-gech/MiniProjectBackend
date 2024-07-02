@@ -14,6 +14,10 @@ const CourseSchema=mongoose.Schema(
             type:mongoose.Schema.Types.ObjectId,
             ref:"User"
         },
+        status:{
+            type:Boolean,
+            default:false
+        }
         
         
        
@@ -32,6 +36,7 @@ const CourseJoi=joi.object({
     image:joi.string().required(),
     catagory:joi.string().required(),
     createdBy:joi.string().required(),
+    
     
     
 })
