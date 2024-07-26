@@ -6,6 +6,11 @@ const CourseSchema=mongoose.Schema(
         
         description:String,
         image:String,
+        price:{
+            type:Number,
+            min:0,
+            default:0
+        },
         catagory:{
             type:mongoose.Schema.Types.ObjectId,
             ref:"CourseCatagory"
@@ -36,6 +41,7 @@ const CourseJoi=joi.object({
     image:joi.string().required(),
     catagory:joi.string().required(),
     createdBy:joi.string().required(),
+    price:joi.number().required(),
     
     
     

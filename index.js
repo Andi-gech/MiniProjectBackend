@@ -27,7 +27,7 @@ app.use('/api/enroll', EnrolledCourse);
 app.use('/api/Notfication', Notification);
 app.use('/api/coursecatagory', CourseCategory); // Corrected typo in route path
 
-app.listen(8080, async () => {
+app.listen(8080,'192.168.1.15', async () => {
     try {
         await connect();
         console.log("listening on port 8080");

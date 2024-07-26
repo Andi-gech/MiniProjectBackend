@@ -2,11 +2,85 @@ const AuthMiddleware = require("../Middleware/AuthMiddleware");
 const mongoose = require("mongoose");
 const { EnrolledCourse } = require("../model/EnrolledCourse");
 const { CourseModule } = require("../model/CourseModule");
+const {Notification}=require("../model/Notification")
 const { validateEnrolledCourse } = require("../model/EnrolledCourse");
 const { Result } = require("../model/Result");
 const {Exam}=require("../model/Exam")
+const {Course}=require("../model/Courses")
+const {User}=require("../model/User")
 const express = require("express")
 const router = express.Router();
+const Chapa = require('chapa')
+
+let myChapa = new Chapa('CHASECK_TEST-lwMIWTxPB90yGBwBN24G7gzdLZWIGkyR')
+router.post('/payinfo/verify',async (req,res)=>{
+  
+  console.log('signal incoming..........................')
+  const jsonObj = JSON.parse(req.body.meta)
+  const user=await User.findOne({email:req.body.email})
+  console.log(jsonObj)
+  const course=await Course.findById(jsonObj.reference)
+  const enroll =await EnrolledCourse.create({
+    user:user._id,
+    course:jsonObj.reference
+  })
+  
+  console.log(enroll,"EEE")
+  await Notification.create({user:user._id,description:`Enrolled to ${course.name}`})
+  
+
+  return res.send(enroll)
+
+})
+
+
+router.post("/pay/:id",AuthMiddleware, async (req, res) => {
+  try{
+const user=await User.findById(req.user._id)
+const course=await Course.findById(req.params.id)
+const enroll =await EnrolledCourse.findOne({user:user._id,course:course._id})
+if(enroll){
+  return res.status(400).send("Already enrolled")
+}
+
+const customerInfo =  {
+  amount: course.price||0,
+  currency: 'ETB',
+  email: user.email,
+  first_name: user.fullName,
+  last_name: user.fullName,
+  return_url: 'http://localhost:5173/learn/'+req.params.id,
+  
+
+ 
+  
+ 
+
+  
+
+
+  customization: {
+    title: 'Test Title',
+    description: 'Test Description',
+  },
+
+  
+  meta: {
+      reference: req.params.id
+  }
+  
+}
+  myChapa.initialize(customerInfo, { autoRef: true }).then(response => {
+   
+   
+    return res.send(response)
+    // saveReference(response.tx_ref)
+}).catch(e => console.log(e)) 
+
+  }catch(error){
+    console.log(error)
+  }
+})
 
 router.get('/:courseid', AuthMiddleware, async (req, res) => {
   try {
@@ -20,6 +94,35 @@ router.get('/:courseid', AuthMiddleware, async (req, res) => {
     return res.status(500).send(error.message);
   }
 });
+
+router.get('/completed/course',AuthMiddleware,async (req,res) => {
+  try {
+ 
+    const enrolledCourses = await EnrolledCourse.find({ user: req.user._id }).populate({
+      path: "course",
+      populate: [
+        {
+          path: "coursemodules",
+               }
+     
+      ]
+    });
+    const completedCourses = enrolledCourses.filter((enrolledCourse) => {
+      return enrolledCourse.completedModules.length===enrolledCourse.course.coursemodules.length
+      
+  
+    })
+    return res.send(completedCourses);
+    
+   
+  } catch (error) {
+    console.log(error)
+    return res.status(500).send(error.message);
+  }
+   
+
+   
+})
 
 router.get("/", AuthMiddleware, async (req, res) => {
   try {

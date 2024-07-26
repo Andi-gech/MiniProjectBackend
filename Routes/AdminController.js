@@ -182,7 +182,7 @@ router.delete("/:courseid/deleteModule/:id",AuthMiddleware,isAdmin,CourseOwner, 
 //add exam
 router.post("/", async (req, res) => {
     const examData = req.body; 
-  console.log(examData.courseModule)
+  console.log(examData)
       try {
         const newExam = new Exam(examData);
           console.log(newExam)
@@ -220,6 +220,7 @@ router.post("/", async (req, res) => {
   
         
           newExam.questions = createdQuestions;
+          
   
           // Save the exam
           await newExam.save();

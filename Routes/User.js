@@ -6,6 +6,21 @@ const jwt =require('jsonwebtoken')
 const AuthMiddleware = require('../Middleware/AuthMiddleware')
 const { Notification } = require('../model/Notification')
 const secretpassword="mysecretpassword"
+const multer = require("multer");
+const path = require('path');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/uploads/catagory'); // Specify the destination directory
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9); // Generate a unique filename
+    cb(null, uniqueSuffix + path.extname(file.originalname)); // Append the original file extension
+  },
+});
+
+const upload = multer({ storage: storage });
+
+
 
 router.post('/Auth',async (req,res)=>{
     try {
@@ -29,7 +44,8 @@ console.log(user)
        res.send({
         token:token,
         role:user.role,
-        name:user.fullName
+        name:user.fullName,
+        id:user._id
     })
     } catch (error) {
         res.status(500).send(error)
@@ -97,6 +113,25 @@ router.put('/:id',async (req,res)=>{
     } catch (error) {
         return res.status(500).send(error.message)
     }
+})
+router.put('/update/me',AuthMiddleware,upload.single("profilepic"),async (req,res)=>{
+    try {
+        console.log(req.body)
+        console.log(req.file)
+        const image = req.file;
+        
+        if(image){
+        
+            req.body.profilepic=`uploads/catagory/${image.filename}`
+        }
+        
+        const result=await User.findByIdAndUpdate(req.user._id,req.body)
+        return res.send(result)
+        
+    } catch (error) {
+        return res.status(500).send(error.message)
+    }
+    
 })
 router.delete('/:id',async (req,res)=>{
     try {
