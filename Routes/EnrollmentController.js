@@ -12,13 +12,15 @@ const express = require("express")
 const router = express.Router();
 const Chapa = require('chapa')
 
-let myChapa = new Chapa('CHASECK_TEST-lwMIWTxPB90yGBwBN24G7gzdLZWIGkyR')
+let myChapa = new Chapa('CHASECK_TEST-gFVzUEvX8t2gMphMHXxf4v75KOnyHIPE')
 router.post('/payinfo/verify',async (req,res)=>{
   
   console.log('signal incoming..........................')
   const jsonObj = JSON.parse(req.body.meta)
   const user=await User.findOne({email:req.body.email})
-  console.log(jsonObj)
+  console.log(
+    'data get   ccccccccccccccccccc'
+  )
   const course=await Course.findById(jsonObj.reference)
   const enroll =await EnrolledCourse.create({
     user:user._id,
@@ -49,7 +51,7 @@ const customerInfo =  {
   email: user.email,
   first_name: user.fullName,
   last_name: user.fullName,
-  return_url: 'http://localhost:5173/learn/'+req.params.id,
+  return_url: 'http://www.google.com',
   
 
  
@@ -71,7 +73,7 @@ const customerInfo =  {
   
 }
   myChapa.initialize(customerInfo, { autoRef: true }).then(response => {
-   
+   console.log(response)
    
     return res.send(response)
     // saveReference(response.tx_ref)

@@ -16,6 +16,10 @@ app.use(express.json());
 
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
+
+app.use((req, res, next) => {
+  setTimeout(next, 3000);
+});
 app.use('/images', express.static('public'));
 
 app.use('/api/user', User);
@@ -27,7 +31,7 @@ app.use('/api/enroll', EnrolledCourse);
 app.use('/api/Notfication', Notification);
 app.use('/api/coursecatagory', CourseCategory); // Corrected typo in route path
 
-app.listen(8080,'192.168.1.15', async () => {
+app.listen(8080,'localhost', async () => {
     try {
         await connect();
         console.log("listening on port 8080");
